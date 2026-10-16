@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Owner sign in — SAKIB</title>
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="../admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../../supabase-config.js" defer></script>
+    <script src="../../supabase-client.js" defer></script>
+    <script src="../../resources.js" defer></script>
+    <script src="../auth.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <a class="skip-link" href="#admin-main">Skip to sign in</a>
+    <header class="site-header admin-header">
+      <nav class="nav shell" aria-label="Admin navigation">
+        <a class="brand" href="../../"><span class="brand-mark" aria-hidden="true">S</span><span>SAKIB<span class="brand-dot">.</span><span class="admin-brand-label"> ADMIN</span></span></a>
+        <a class="admin-back-link" href="../../">View website <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <main id="admin-main" class="shell admin-shell login-shell">
+      <section class="admin-intro">
+        <p class="eyebrow"><span class="status-dot"></span> PRIVATE OWNER ACCESS <span class="eyebrow-line"></span> GOOGLE SIGN-IN</p>
+        <h1>Welcome <span>back.</span></h1>
+        <p>This secure sign-in is reserved for the verified owner Google account. Other visitors cannot view or change private dashboard data.</p>
+      </section>
+      <section class="admin-config-notice" id="config-notice" role="alert" hidden>
+        <strong>Supabase setup required</strong>
+        <p id="config-message"></p>
+        <a href="../../README.md">Open the setup guide <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="admin-login-panel" aria-labelledby="login-title">
+        <div class="admin-panel-heading"><span class="admin-lock-icon" aria-hidden="true">⌑</span><div><p class="eyebrow">GOOGLE OAUTH · VERIFIED OWNER</p><h2 id="login-title">Administrator sign in</h2></div></div>
+        <p class="admin-hint">Continue with the Google account <strong>gdsakib67@gmail.com</strong>. Admin access is also checked by Supabase policies after sign-in.</p>
+        <button class="button button-dark google-sign-in" id="google-sign-in" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.8 6.1C12.3 13.8 17.7 9.5 24 9.5Z"/><path fill="#4285F4" d="M47.5 24.5c0-1.6-.2-3.2-.5-4.7H24v9h13.2c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 7.7-10 7.7-17.2Z"/><path fill="#FBBC05" d="M10.4 28.6a14.5 14.5 0 0 1 0-9.2l-7.8-6.1a24 24 0 0 0 0 21.4l7.8-6.1Z"/><path fill="#34A853" d="M24 48c6.5 0 12-2.1 16-6.3l-7.4-5.7c-2 1.4-4.6 2.3-8.6 2.3-6.3 0-11.7-4.3-13.6-10.1l-7.8 6.1C6.5 42.6 14.6 48 24 48Z"/></svg>
+          Continue with Google <span aria-hidden="true">↗</span>
+        </button>
+        <p class="form-message" id="login-message" role="status" aria-live="polite"></p>
+        <p class="admin-security-note"><span aria-hidden="true">⌑</span> No passwords are collected by this website. Google and Supabase authenticate your account.</p>
+      </section>
+    </main>
+    <footer class="site-footer admin-footer"><div class="shell footer-bottom"><span>© <span id="current-year"></span> SAKIB.</span><a href="../../">Return to public website ↗</a><span>PRIVATE ADMINISTRATOR SIGN-IN.</span></div></footer>
+  </body>
+</html>

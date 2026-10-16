@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Minecraft, Free Fire, OBS, and PC gaming tutorial downloads from SAKIB. Find real files, tools, and resources used in the videos.">
+    <meta property="og:title" content="SAKIB — Gaming Resource Hub">
+    <meta property="og:description" content="Minecraft, Free Fire, OBS, and PC gaming tutorial resources from SAKIB.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./og-image.svg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary">
+    <title>SAKIB — Gaming Resource Hub</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="./supabase-config.js" defer></script>
+    <script src="./supabase-client.js" defer></script>
+    <script src="./resources.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="cursor-glow" aria-hidden="true"></div>
+    <section class="cinematic-intro" id="cinematic-intro" aria-label="SAKIB introduction" aria-modal="true" role="dialog" hidden>
+      <div class="intro-stars" aria-hidden="true"></div>
+      <div class="intro-beam intro-beam-one" aria-hidden="true"></div>
+      <div class="intro-beam intro-beam-two" aria-hidden="true"></div>
+      <div class="intro-content">
+        <div class="intro-mark" aria-hidden="true"><span>S</span><i></i></div>
+        <p class="intro-overline">WELCOME TO THE RESOURCE UNIVERSE</p>
+        <h2 class="intro-title">SAKIB<span>.</span></h2>
+        <p class="intro-tagline">GAMING <i></i> DOWNLOADS <i></i> TUTORIALS</p>
+        <a class="intro-youtube" data-channel-link href="https://www.youtube.com/@gdsakib67" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+          <span>VISIT MY YOUTUBE CHANNEL</span><b aria-hidden="true">↗</b>
+        </a>
+      </div>
+      <div class="intro-bottom"><span>GDSAKIB67 · EST. FOR CREATORS</span><button class="intro-skip" id="intro-skip" type="button">SKIP INTRO <span aria-hidden="true">↗</span></button></div>
+      <div class="intro-progress" aria-hidden="true"><span></span></div>
+    </section>
+    <header class="site-header" id="top">
+      <nav class="nav shell" aria-label="Main navigation">
+        <a class="brand" href="#top" aria-label="SAKIB home">
+          <span class="brand-mark" aria-hidden="true">S</span>
+          <span>SAKIB<span class="brand-dot">.</span></span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open navigation">
+          <span></span><span></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+          <a href="#downloads">Game resources</a>
+          <a href="#recent-resources-section">New files</a>
+          <a href="#videos">Videos</a>
+          <a href="#about">About</a>
+          <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch theme">
+            <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.1 15.6A8.7 8.7 0 0 1 8.4 3.9 8.8 8.8 0 1 0 20.1 15.6Z"/></svg>
+          </button>
+        </div>
+      </nav>
+    </header>
+    <section class="announcement-banner" id="announcement-banner" aria-label="Site announcements" aria-live="polite" hidden></section>
+
+    <main id="main">
+      <section class="hero shell" aria-labelledby="hero-title">
+        <div class="hero-copy reveal">
+          <p class="eyebrow"><span class="status-dot"></span> THE GAMING RESOURCE HUB <span class="eyebrow-line"></span> GDSAKIB67</p>
+          <h1 id="hero-title">SAKIB <span class="hero-dash">—</span><br><span class="outline-text">GAMING</span> RESOURCES<span class="hero-period">.</span></h1>
+          <p class="hero-subtitle" id="hero-description">Minecraft builds, Free Fire guides, OBS tools, and PC gaming resources from my tutorials.</p>
+          <div class="hero-actions">
+            <a class="button button-dark" href="#downloads">Explore downloads <span aria-hidden="true">↗</span></a>
+            <a class="button button-light" data-channel-link href="#videos">Watch on YouTube <span class="youtube-play" aria-hidden="true">▶</span></a>
+          </div>
+          <div class="hero-note"><span class="note-icon" aria-hidden="true">↓</span> REAL TUTORIAL FILES. READY TO PLAY.</div>
+        </div>
+        <div class="hero-art reveal" aria-hidden="true">
+          <div class="art-orbit orbit-one"></div>
+          <div class="art-orbit orbit-two"></div>
+          <div class="art-cross cross-a">+</div><div class="art-cross cross-b">+</div>
+          <div class="art-card">
+            <div class="art-card-top"><span class="art-live"></span><span>GAMING_RESOURCE_HUB</span><span class="art-dots">•••</span></div>
+            <div class="art-folder"><svg viewBox="0 0 80 70"><path d="M7 17a7 7 0 0 1 7-7h19l8 8h25a7 7 0 0 1 7 7v31a7 7 0 0 1-7 7H14a7 7 0 0 1-7-7Z"/><path class="folder-cut" d="M8 28h62"/></svg><span>PLAY</span></div>
+            <div class="art-card-meta"><strong>BUILD. CREATE.<br>PLAY YOUR WAY.</strong><span>GAMING TUTORIALS <b>↘</b></span></div>
+          </div>
+          <div class="floating-tag tag-top"><span class="tag-symbol">✳</span> DOWNLOADS<br><b>MADE EASY</b></div>
+          <div class="floating-tag tag-bottom"><span class="tag-symbol">⌘</span> FILES FROM<br><b>YOUR FAV VIDEOS</b></div>
+          <div class="hero-glow"></div>
+        </div>
+        <a class="scroll-cue" href="#downloads"><span></span> SCROLL TO EXPLORE</a>
+      </section>
+
+      <section class="download-section section-pad" id="downloads" aria-labelledby="downloads-title">
+        <div class="shell">
+          <div class="section-heading reveal">
+            <div><p class="eyebrow section-kicker">THE GOOD STUFF <span class="eyebrow-line"></span> 01</p><h2 id="downloads-title">Download <span>center.</span></h2></div>
+            <p class="section-aside">The files you came for, organized and ready.<br>Find your next project below.</p>
+          </div>
+          <div class="library-toolbar reveal">
+            <label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span class="sr-only">Search resources</span><input id="resource-search" type="search" placeholder="Search files, topics, tutorials..." autocomplete="off"><kbd>/</kbd></label>
+            <label class="sort-control"><span class="sr-only">Sort resources</span><select id="resource-sort"><option value="featured">Sort: Featured</option><option value="name">Name: A–Z</option><option value="type">File type</option></select><span aria-hidden="true">⌄</span></label>
+          </div>
+          <div class="filter-row reveal" id="category-filters" aria-label="Filter resources by category"></div>
+          <section class="resource-discovery" id="weekly-feature-section" aria-labelledby="weekly-feature-title" hidden>
+            <div class="discovery-heading reveal"><div><p class="eyebrow section-kicker">HAND-PICKED BY SAKIB</p><h3 id="weekly-feature-title">Featured resource <span>of the week.</span></h3></div><p>Chosen in the owner dashboard. Every file is a real published resource.</p></div>
+            <div class="resource-grid resource-grid-featured" id="weekly-feature"></div>
+          </section>
+          <section class="resource-discovery" id="trending-resources-section" aria-labelledby="trending-title" hidden>
+            <div class="discovery-heading reveal"><div><p class="eyebrow section-kicker">CREATOR-CURATED PICKS</p><h3 id="trending-title">Trending <span>downloads.</span></h3></div><p>Featured resources selected by SAKIB—not view or download-count rankings.</p></div>
+            <div class="resource-grid resource-grid-discovery" id="trending-grid"></div>
+          </section>
+          <section class="resource-discovery" id="recent-resources-section" aria-labelledby="recent-title" hidden>
+            <div class="discovery-heading reveal"><div><p class="eyebrow section-kicker">FRESH FROM THE CHANNEL</p><h3 id="recent-title">Recently <span>added.</span></h3></div><p>Newest published files, ordered by their actual publish date.</p></div>
+            <div class="resource-grid resource-grid-discovery" id="recent-grid"></div>
+          </section>
+          <p class="result-count" id="result-count" aria-live="polite"></p>
+          <div class="resource-grid" id="resource-grid" aria-live="polite"></div>
+          <div class="empty-state" id="empty-state" hidden>
+            <span class="empty-icon" aria-hidden="true">⌕</span>
+            <h3 id="empty-title">No resources yet.</h3>
+            <p id="empty-message">New files are on the way. Check back after the next tutorial.</p>
+            <button class="text-button" id="clear-filters" type="button" hidden>Clear search &amp; filters <span aria-hidden="true">↗</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="video-section section-pad" id="videos" aria-labelledby="videos-title">
+        <div class="shell">
+          <div class="section-heading reveal">
+            <div><p class="eyebrow section-kicker">WATCH. LEARN. DOWNLOAD. <span class="eyebrow-line"></span> 02</p><h2 id="videos-title">From the <span>channel.</span></h2></div>
+            <a class="button button-dark subscribe-button" data-channel-link href="#videos">Subscribe on YouTube <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="video-grid" id="video-grid"></div>
+          <div class="video-empty reveal" id="video-empty"><span class="video-empty-icon" aria-hidden="true">▶</span><div><h3>Good videos. Useful files.</h3><p>Video links and thumbnails will show up here as soon as you add them to the resource configuration.</p></div></div>
+        </div>
+      </section>
+
+      <section class="creator-section section-pad" id="creator" aria-labelledby="creator-title">
+        <div class="shell creator-panel reveal">
+          <div class="creator-monogram" aria-hidden="true">S<span>.</span></div>
+          <div class="creator-copy"><p class="eyebrow">THE CREATOR BEHIND THE BUILDS <span class="eyebrow-line"></span></p><h2 id="creator-title">Made by <span>SAKIB.</span></h2><p class="creator-handle">@gdsakib67</p><p>Minecraft, Free Fire, PC gaming, and creator-tool tutorials—with the actual files and resources used along the way.</p></div>
+          <a class="button creator-subscribe" data-channel-link href="https://www.youtube.com/@gdsakib67" target="_blank" rel="noopener noreferrer">Subscribe on YouTube <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="about-section section-pad" id="about" aria-labelledby="about-title">
+        <div class="shell about-panel reveal">
+          <div><p class="eyebrow">YOUR NEXT SESSION STARTS HERE <span class="eyebrow-line"></span></p><h2 id="about-title">Less searching.<br><span>More gaming.</span></h2></div>
+          <div class="about-copy"><p>Find real Minecraft, Free Fire, OBS, and PC gaming resources from SAKIB’s tutorials. No made-up download counts—just useful files, organized by game and creator tool.</p><a class="button button-white" href="#downloads">Find your files <span aria-hidden="true">↗</span></a></div>
+          <span class="about-decoration" aria-hidden="true">S.</span>
+        </div>
+      </section>
+
+      <section class="feedback-section section-pad" id="feedback" aria-labelledby="feedback-title">
+        <div class="shell feedback-layout">
+          <div class="feedback-intro reveal"><p class="eyebrow">HELP SHAPE THE NEXT DROP <span class="eyebrow-line"></span></p><h2 id="feedback-title">Got a resource <span>request?</span></h2><p>Suggest a tutorial file or report a resource issue. Messages go to SAKIB only after a spam-protected form endpoint is configured.</p></div>
+          <form class="feedback-form reveal" id="feedback-form" hidden>
+            <label for="feedback-name">Name <span class="field-optional">optional</span></label><input id="feedback-name" name="name" maxlength="80" autocomplete="name">
+            <label for="feedback-email">Email <span class="field-optional">optional</span></label><input id="feedback-email" name="email" type="email" maxlength="254" autocomplete="email">
+            <label for="feedback-message">Your request or feedback</label><textarea id="feedback-message" name="message" rows="4" maxlength="1500" required></textarea>
+            <label class="feedback-honeypot" aria-hidden="true">Leave this field empty<input name="_gotcha" tabindex="-1" autocomplete="off"></label>
+            <input type="hidden" name="_subject" value="SAKIB Gaming Resource Website feedback">
+            <p class="feedback-endpoint-note" id="feedback-endpoint-note"></p>
+            <button class="button button-dark" id="feedback-submit" type="submit">Send feedback <span aria-hidden="true">↗</span></button>
+            <p class="feedback-status" id="feedback-status" role="status" aria-live="polite"></p>
+          </form>
+          <aside class="feedback-not-configured reveal" id="feedback-not-configured"><span aria-hidden="true">✳</span><h3>Have a request?</h3><p>Feedback is not connected yet. The owner can set up a protected endpoint in the site configuration to accept messages safely.</p></aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-main">
+        <a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true">S</span><span>SAKIB<span class="brand-dot">.</span></span></a>
+        <p id="footer-copy">Made for the curious.<br>Built for the next big idea.</p>
+        <div class="footer-links"><a data-channel-link href="https://www.youtube.com/@gdsakib67" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span></a><a href="#downloads">Resources <span aria-hidden="true">↗</span></a><a href="#feedback">Feedback <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div class="shell footer-bottom"><span>© <span id="current-year"></span> SAKIB. ALL RIGHTS RESERVED.</span><a href="#top">BACK TO TOP ↑</a><span>BUILT TO MAKE. <b>NOT TO SCROLL.</b></span></div>
+    </footer>
+    <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">↑</button>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

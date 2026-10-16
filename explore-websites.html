@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Explore useful gaming, AI, Minecraft, free, learning, editing, and developer websites curated by SAKIB.">
+    <meta name="robots" content="index, follow">
+    <title>Explore Websites — SAKIB</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="./supabase-config.js" defer></script>
+    <script src="./supabase-client.js" defer></script>
+    <script src="./resources.js" defer></script>
+    <script src="./catalog.js" defer></script>
+  </head>
+  <body data-catalog-page="websites">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header" id="top">
+      <nav class="nav shell" aria-label="Main navigation">
+        <a class="brand" href="./" aria-label="SAKIB home"><span class="brand-mark" aria-hidden="true">S</span><span>SAKIB<span class="brand-dot">.</span></span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open navigation"><span></span><span></span></button>
+        <div class="nav-links" id="nav-links"><a href="./#downloads">Downloads</a><a href="./#apps">Apps &amp; tools</a><a href="./#videos">Videos</a><a href="./">Home</a><button class="theme-toggle directory-theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch theme"><svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.1 15.6A8.7 8.7 0 0 1 8.4 3.9 8.8 8.8 0 1 0 20.1 15.6Z"/></svg></button></div>
+      </nav>
+    </header>
+    <main class="directory-main" id="main">
+      <section class="directory-hero shell">
+        <p class="eyebrow"><span class="status-dot"></span> A CURATED CORNER OF THE WEB <span class="eyebrow-line"></span> GDSAKIB67</p>
+        <h1>Cool websites.<br><span>Worth exploring.</span></h1>
+        <p>Useful places for gaming, creating, learning, and building—shared by SAKIB.</p>
+        <label class="search-box directory-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span class="sr-only">Search websites</span><input id="website-search" type="search" placeholder="Search useful websites..." autocomplete="off"></label>
+      </section>
+      <section class="directory-section section-pad" aria-labelledby="directory-title">
+        <div class="shell">
+          <div class="section-heading"><div><p class="eyebrow section-kicker">DISCOVER SOMETHING USEFUL <span class="eyebrow-line"></span></p><h2 id="directory-title">Explore <span>websites.</span></h2></div><a class="button button-light" href="./">Back to resource hub <span aria-hidden="true">↗</span></a></div>
+          <div class="filter-row" id="website-categories" aria-label="Filter websites by category"></div>
+          <div class="directory-featured" id="featured-websites-section" hidden><div class="discovery-heading"><div><p class="eyebrow section-kicker">CURATED BY SAKIB</p><h3>Featured <span>links.</span></h3></div></div><div class="website-grid" id="featured-websites"></div></div>
+          <div class="website-grid" id="website-grid" aria-live="polite" aria-busy="true"></div>
+          <div class="empty-state" id="website-empty" hidden><span class="empty-icon" aria-hidden="true">⌕</span><h3>No websites found.</h3><p>Try another search or category, or check back later.</p></div>
+          <p class="catalog-error" id="website-error" role="status"></p>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="shell footer-bottom"><span>© <span id="current-year"></span> SAKIB.</span><a href="./">Return to resource hub ↗</a><span>CURATED LINKS · SAFE EXTERNAL NAVIGATION.</span></div></footer>
+  </body>
+</html>

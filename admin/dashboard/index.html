@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dashboard — SAKIB</title>
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="../admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../../supabase-config.js" defer></script>
+    <script src="../../supabase-client.js" defer></script>
+    <script src="../../resources.js" defer></script>
+    <script src="../dashboard.js" defer></script>
+    <script src="../catalog-admin.js" defer></script>
+  </head>
+  <body class="admin-page dashboard-page">
+    <a class="skip-link" href="#dashboard-content">Skip to dashboard</a>
+    <header class="site-header admin-header">
+      <nav class="nav shell" aria-label="Dashboard header">
+        <a class="brand" href="../../"><span class="brand-mark" aria-hidden="true">S</span><span>SAKIB<span class="brand-dot">.</span><span class="admin-brand-label"> STUDIO</span></span></a>
+        <div class="admin-nav-actions"><span class="owner-email" id="owner-email"></span><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch theme"><svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.1 15.6A8.7 8.7 0 0 1 8.4 3.9 8.8 8.8 0 1 0 20.1 15.6Z"/></svg></button><button class="admin-logout button button-light" id="logout-button" type="button" hidden>Sign out</button></div>
+      </nav>
+    </header>
+    <main id="dashboard-content" class="shell studio-shell" hidden>
+      <aside class="studio-sidebar" aria-label="Dashboard sections">
+        <p class="eyebrow">WORKSPACE <span class="eyebrow-line"></span></p>
+        <nav class="studio-nav">
+          <button class="studio-nav-link active" type="button" data-panel="overview"><span aria-hidden="true">◫</span> Overview</button>
+          <button class="studio-nav-link" type="button" data-panel="downloads"><span aria-hidden="true">↓</span> Downloads <span class="nav-count" id="nav-resource-count">0</span></button>
+          <button class="studio-nav-link" type="button" data-panel="apps"><span aria-hidden="true">▣</span> Apps</button>
+          <button class="studio-nav-link" type="button" data-panel="websites"><span aria-hidden="true">↗</span> Website links</button>
+          <button class="studio-nav-link" type="button" data-panel="announcements"><span aria-hidden="true">◉</span> Announcements</button>
+          <button class="studio-nav-link" type="button" data-panel="settings"><span aria-hidden="true">⚙</span> Website settings</button>
+          <button class="studio-nav-link" type="button" id="sidebar-logout"><span aria-hidden="true">↪</span> Logout</button>
+          <a class="studio-nav-link studio-visit-link" href="../../"><span aria-hidden="true">↗</span> View website</a>
+        </nav>
+        <div class="sidebar-owner"><span class="status-dot"></span><span>OWNER ACCESS<br><b>GOOGLE VERIFIED</b></span></div>
+      </aside>
+
+      <div class="studio-main">
+        <section class="studio-panel active" id="panel-overview">
+          <div class="studio-page-heading"><div><p class="eyebrow">YOUR CHANNEL · YOUR RULES <span class="eyebrow-line"></span> OVERVIEW</p><h1>Good to see you.</h1><p>Manage your files, updates, and website content from one place.</p></div><button type="button" class="button button-dark quick-upload" data-go-panel="downloads">Upload a resource <span aria-hidden="true">↗</span></button></div>
+          <div class="stats-grid">
+            <article class="stat-card"><span class="stat-icon">↓</span><p>TOTAL RESOURCES</p><strong id="stat-total">—</strong><span>stored in your library</span></article>
+            <article class="stat-card"><span class="stat-icon stat-green">↗</span><p>PUBLISHED FILES</p><strong id="stat-published">—</strong><span>available to visitors</span></article>
+            <article class="stat-card"><span class="stat-icon">◷</span><p>PRIVATE DRAFTS</p><strong id="stat-drafts">—</strong><span>visible only to you</span></article>
+            <article class="stat-card"><span class="stat-icon">◉</span><p>ANNOUNCEMENTS</p><strong id="stat-announcements">—</strong><span>currently published</span></article>
+          </div>
+          <section class="studio-card overview-resources"><div class="card-heading"><div><p class="eyebrow">RECENT ACTIVITY</p><h2>Your latest resources</h2></div><button type="button" class="text-button" data-go-panel="downloads">Manage downloads <span aria-hidden="true">↗</span></button></div><div id="recent-resources" class="recent-list"><p class="admin-list-message">Loading dashboard data…</p></div></section>
+          <section class="studio-card setup-reminder" id="settings-draft-reminder" hidden><strong>Website settings have unpublished edits.</strong><p>Your draft preview is private. Publish it from Website settings when it's ready.</p><button class="text-button" type="button" data-go-panel="settings">Review draft <span aria-hidden="true">↗</span></button></section>
+        </section>
+
+        <section class="studio-panel" id="panel-downloads" hidden>
+          <div class="studio-page-heading"><div><p class="eyebrow">YOUR DOWNLOAD LIBRARY <span class="eyebrow-line"></span> FILES</p><h1>Downloads.</h1><p>Upload files, connect tutorials, and control what visitors can download.</p></div></div>
+          <div class="studio-two-column">
+            <section class="studio-card" aria-labelledby="resource-form-title"><div class="card-heading"><div><p class="eyebrow" id="resource-form-mode">NEW FILE</p><h2 id="resource-form-title">Add a resource</h2></div></div>
+              <form id="resource-form" class="studio-form">
+                <input id="resource-id" type="hidden">
+                <label for="resource-name">File title <span>*</span></label><input id="resource-name" maxlength="120" required placeholder="e.g. Minecraft starter world">
+                <label for="resource-description">Description <span>*</span></label><textarea id="resource-description" rows="3" maxlength="600" required placeholder="Describe what's included."></textarea>
+                <label for="resource-category">Category <span>*</span></label><select id="resource-category" required></select>
+                <label for="resource-video">Related YouTube video URL</label><input id="resource-video" type="url" maxlength="500" placeholder="https://www.youtube.com/watch?v=...">
+                <label for="resource-file">Resource file <span class="field-optional" id="file-required-hint">* required</span></label><input id="resource-file" type="file" accept=".pdf,.zip,.png,.jpg,.jpeg,.txt,.json,.csv,.webp,.md,.log,application/pdf,application/zip,image/png,image/jpeg,image/webp,text/plain,text/markdown,application/json,text/csv">
+                <p class="field-hint" id="current-file-hint">PDF, ZIP, PNG, JPG, TXT, JSON, CSV, WEBP, MD, LOG · max 100 MB.</p>
+                <label for="resource-thumbnail">Thumbnail <span class="field-optional">optional</span></label><input id="resource-thumbnail" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+                <p class="field-hint" id="current-thumbnail-hint">PNG, JPG, WEBP · max 5 MB.</p>
+                <label class="check-label" id="remove-thumbnail-wrap" hidden><input id="remove-thumbnail" type="checkbox"> Remove current thumbnail</label>
+                <div class="upload-status" id="upload-status" hidden><div class="upload-status-top"><span id="upload-message">Preparing upload…</span><span id="upload-percent">0%</span></div><progress id="upload-progress" max="100" value="0">0%</progress></div>
+                <p class="form-message" id="resource-message" role="status" aria-live="polite"></p>
+                <div class="admin-form-actions"><button class="button button-light" id="save-draft-button" type="submit" name="publish" value="false">Save draft</button><button class="button button-dark" id="publish-button" type="submit" name="publish" value="true">Publish resource <span aria-hidden="true">↗</span></button><button class="text-button cancel-edit-button" id="cancel-edit-button" type="button" hidden>Cancel</button></div>
+              </form>
+            </section>
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow">STORAGE &amp; VISIBILITY</p><h2>Your resources</h2></div><label class="admin-search"><span class="sr-only">Search resources</span><input id="admin-resource-search" type="search" placeholder="Search resources"></label></div><div class="admin-resource-list" id="admin-resource-list" aria-live="polite"><p class="admin-list-message">Loading resources…</p></div></section>
+          </div>
+        </section>
+
+        <section class="studio-panel" id="panel-apps" hidden>
+          <div class="studio-page-heading"><div><p class="eyebrow">APPS &amp; CREATOR TOOLS <span class="eyebrow-line"></span> APP LIBRARY</p><h1>Useful apps.</h1><p>Upload permitted installers and ZIPs, add details, preview, and publish them to the public app hub.</p></div></div>
+          <div class="studio-two-column">
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow" id="app-form-mode">NEW APP</p><h2 id="app-form-title">Add an app</h2></div></div>
+              <form id="app-form" class="studio-form">
+                <input type="hidden" id="app-id">
+                <label for="app-name">App name <span>*</span></label><input id="app-name" maxlength="120" required>
+                <label for="app-description">Description <span>*</span></label><textarea id="app-description" rows="3" maxlength="800" required></textarea>
+                <label for="app-category">Category <span>*</span></label><select id="app-category" required><option value="">Choose a category</option><option>Gaming Apps</option><option>PC Tools</option><option>Android Apps</option><option>Minecraft Tools</option><option>Video Editing</option><option>Streaming Tools</option><option>Other Apps</option></select>
+                <label for="app-version">Version</label><input id="app-version" maxlength="40" placeholder="Optional">
+                <label for="app-file">Installer or ZIP <span class="field-optional" id="app-file-required">* required</span></label><input id="app-file" type="file" accept=".zip,.apk,.msi,.exe,.pdf,.png,.jpg,.jpeg,.txt,.json,.csv,.webp,.md,.log,application/zip,application/vnd.android.package-archive,application/x-msi,application/vnd.microsoft.portable-executable,application/octet-stream">
+                <p class="field-hint" id="app-current-file">ZIP, APK, MSI, EXE and supported tutorial files · max 100 MB.</p>
+                <label for="app-icon">App icon or thumbnail <span class="field-optional">optional</span></label><input id="app-icon" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+                <label for="app-screenshots">Screenshots <span class="field-optional">up to 5 images</span></label><input id="app-screenshots" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" multiple>
+                <label for="app-official-url">Official website URL</label><input id="app-official-url" type="url" maxlength="500" placeholder="https://...">
+                <label for="app-video-url">Optional tutorial video URL</label><input id="app-video-url" type="url" maxlength="500" placeholder="https://www.youtube.com/watch?v=...">
+                <label class="check-label"><input id="app-featured" type="checkbox"> Feature this app</label>
+                <div class="upload-status" id="app-upload-status" hidden><div class="upload-status-top"><span id="app-upload-message">Preparing upload…</span><span id="app-upload-percent">0%</span></div><progress id="app-upload-progress" max="100" value="0">0%</progress></div>
+                <div class="catalog-preview" id="app-preview"><strong>Private preview</strong><span id="app-preview-title">Your app title</span><p id="app-preview-description">Your description will appear here.</p></div>
+                <p class="form-message" id="app-form-message" role="status" aria-live="polite"></p>
+                <div class="admin-form-actions"><button class="button button-light" type="submit" name="publish" value="false">Save draft</button><button class="button button-dark" type="submit" name="publish" value="true">Publish app <span aria-hidden="true">↗</span></button><button class="text-button" id="app-cancel-edit" type="button" hidden>Cancel edit</button></div>
+              </form>
+            </section>
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow">PUBLIC &amp; PRIVATE</p><h2>Manage apps</h2></div><label class="admin-search"><span class="sr-only">Search apps</span><input id="admin-app-search" type="search" placeholder="Search apps"></label></div><div class="admin-resource-list" id="admin-app-list" aria-live="polite"><p class="admin-list-message">Loading apps…</p></div></section>
+          </div>
+        </section>
+
+        <section class="studio-panel" id="panel-websites" hidden>
+          <div class="studio-page-heading"><div><p class="eyebrow">CURATED DIRECTORY <span class="eyebrow-line"></span> USEFUL LINKS</p><h1>Cool websites.</h1><p>Share useful, trusted websites. Only HTTPS destinations can be published.</p></div></div>
+          <div class="studio-two-column">
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow" id="website-form-mode">NEW WEBSITE LINK</p><h2 id="website-form-title">Add a website</h2></div></div>
+              <form id="website-form" class="studio-form">
+                <input type="hidden" id="website-id">
+                <label for="website-title">Title <span>*</span></label><input id="website-title" maxlength="120" required>
+                <label for="website-description">Description <span>*</span></label><textarea id="website-description" rows="3" maxlength="800" required></textarea>
+                <label for="website-category">Category <span>*</span></label><select id="website-category" required><option value="">Choose a category</option><option>Gaming</option><option>AI Tools</option><option>Minecraft</option><option>Free Tools</option><option>Learning</option><option>Editing</option><option>Developer Tools</option></select>
+                <label for="website-url">Website URL <span>*</span></label><input id="website-url" type="url" maxlength="1000" placeholder="https://..." required>
+                <label for="website-thumbnail">Thumbnail <span class="field-optional">optional · PNG/JPG/WEBP, max 5 MB</span></label><input id="website-thumbnail" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+                <label class="check-label"><input id="website-featured" type="checkbox"> Feature this link</label>
+                <div class="catalog-preview"><strong>Private preview</strong><span id="website-preview-title">Your website title</span><p id="website-preview-description">Description and safe destination preview.</p></div>
+                <p class="form-message" id="website-form-message" role="status" aria-live="polite"></p>
+                <div class="admin-form-actions"><button class="button button-light" type="submit" name="publish" value="false">Save draft</button><button class="button button-dark" type="submit" name="publish" value="true">Publish link <span aria-hidden="true">↗</span></button><button class="text-button" id="website-cancel-edit" type="button" hidden>Cancel edit</button></div>
+              </form>
+            </section>
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow">PUBLIC &amp; PRIVATE</p><h2>Manage websites</h2></div><label class="admin-search"><span class="sr-only">Search website links</span><input id="admin-website-search" type="search" placeholder="Search websites"></label></div><div class="admin-resource-list" id="admin-website-list" aria-live="polite"><p class="admin-list-message">Loading websites…</p></div></section>
+          </div>
+        </section>
+
+        <section class="studio-panel" id="panel-announcements" hidden>
+          <div class="studio-page-heading"><div><p class="eyebrow">WHAT'S NEW <span class="eyebrow-line"></span> ANNOUNCEMENTS</p><h1>Keep them <span>in the loop.</span></h1><p>Publish a site-wide announcement. Visitors can dismiss it in their browser.</p></div></div>
+          <div class="studio-two-column">
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow" id="announcement-form-mode">NEW ANNOUNCEMENT</p><h2 id="announcement-form-title">Write an update</h2></div></div>
+              <form id="announcement-form" class="studio-form"><input type="hidden" id="announcement-id"><label for="announcement-title">Title <span>*</span></label><input id="announcement-title" maxlength="120" required placeholder="e.g. New tutorial files are here!"><label for="announcement-message">Message <span>*</span></label><textarea id="announcement-message" rows="5" maxlength="800" required placeholder="Write a quick note for your visitors."></textarea><label for="announcement-link">Optional link</label><input id="announcement-link" type="url" maxlength="500" placeholder="https://..."><p class="form-message" id="announcement-form-message" role="status" aria-live="polite"></p><div class="admin-form-actions"><button class="button button-light" type="submit" name="publish" value="false">Save draft</button><button class="button button-dark" type="submit" name="publish" value="true">Publish announcement <span aria-hidden="true">↗</span></button><button class="text-button" id="cancel-announcement-edit" type="button" hidden>Cancel edit</button></div></form>
+            </section>
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow">PUBLIC &amp; PRIVATE</p><h2>Your announcements</h2></div></div><div id="announcement-list" class="admin-resource-list" aria-live="polite"><p class="admin-list-message">Loading announcements…</p></div></section>
+          </div>
+        </section>
+
+        <section class="studio-panel" id="panel-settings" hidden>
+          <div class="studio-page-heading"><div><p class="eyebrow">MAKE IT YOURS <span class="eyebrow-line"></span> WEBSITE SETTINGS</p><h1>Your website, <span>your voice.</span></h1><p>Changes are private until you publish. Preview your edits before visitors see them.</p></div><span class="draft-badge" id="settings-status">PUBLISHED SETTINGS</span></div>
+          <div class="studio-two-column settings-columns">
+            <section class="studio-card"><div class="card-heading"><div><p class="eyebrow">DRAFT EDITOR</p><h2>Homepage &amp; links</h2></div></div>
+              <form id="settings-form" class="studio-form">
+                <label for="settings-heading">Homepage heading</label><input id="settings-heading" maxlength="100" required>
+                <label for="settings-description">Homepage description</label><textarea id="settings-description" rows="3" maxlength="300" required></textarea>
+                <label for="settings-channel">YouTube channel URL</label><input id="settings-channel" type="url" maxlength="500" placeholder="https://www.youtube.com/@your-channel">
+                <label for="settings-socials">Social links <span class="field-optional">one per line: name | https://link</span></label><textarea id="settings-socials" rows="3" placeholder="Instagram | https://www.instagram.com/your-account"></textarea>
+                <label for="settings-videos">YouTube videos <span class="field-optional">one per line: title | video URL | optional thumbnail URL</span></label><textarea id="settings-videos" rows="4" placeholder="Tutorial title | https://www.youtube.com/watch?v=... | https://your-thumbnail.jpg"></textarea>
+                <label for="settings-categories">Resource categories <span class="field-optional">one per line</span></label><textarea id="settings-categories" rows="5"></textarea>
+                <fieldset class="featured-picker"><legend>Featured downloads</legend><p class="field-hint">Selected published resources appear in the creator-curated downloads area.</p><div id="featured-resource-options"></div><label for="settings-weekly-resource">Featured resource of the week</label><select id="settings-weekly-resource"><option value="">No weekly feature</option></select></fieldset>
+                <label for="settings-footer">Footer text</label><textarea id="settings-footer" rows="2" maxlength="250"></textarea>
+                <p class="form-message" id="settings-message" role="status" aria-live="polite"></p>
+                <div class="admin-form-actions"><button class="button button-light" id="save-settings-draft" type="submit">Save private draft</button><button class="button button-dark" id="publish-settings" type="button">Publish website settings <span aria-hidden="true">↗</span></button></div>
+              </form>
+            </section>
+            <section class="studio-card preview-card"><div class="card-heading"><div><p class="eyebrow">LIVE PREVIEW · PRIVATE</p><h2>Preview changes</h2></div><span class="preview-status">ONLY YOU CAN SEE THIS</span></div><div class="settings-preview"><p class="eyebrow">THE RESOURCE HUB <span class="eyebrow-line"></span> GDSAKIB67</p><h3 id="preview-heading">SAKIB — GAMING RESOURCES</h3><p id="preview-description">Minecraft builds, Free Fire guides, OBS tools, and PC gaming resources from my tutorials.</p><div class="preview-categories" id="preview-categories"></div><div class="preview-footer" id="preview-links"></div><div class="preview-footer" id="preview-weekly"></div><div class="preview-footer" id="preview-footer"></div><div class="preview-footer" id="preview-videos"></div></div><p class="field-hint">This preview does not update the live site until you publish these settings.</p></section>
+          </div>
+        </section>
+
+        <div class="dashboard-error" id="dashboard-error" role="alert" hidden></div>
+      </div>
+    </main>
+    <footer class="site-footer admin-footer"><div class="shell footer-bottom"><span>© <span id="current-year"></span> SAKIB.</span><a href="../../">Return to public website ↗</a><span>PRIVATE OWNER DASHBOARD · GOOGLE AUTHENTICATED.</span></div></footer>
+    <div class="toast" id="admin-toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
