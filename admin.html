@@ -1,0 +1,1068 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAKIB | Control Center</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080c18;color:#edf5ff;font:15px Arial,sans-serif}
+header{padding:20px;background:#111a2e;border-bottom:1px solid #263955;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:23px;font-weight:900;color:#00eaff}
+main{max-width:1100px;margin:auto;padding:22px}
+h1{font-size:clamp(26px,5vw,40px)}
+h1 span{color:#00eaff}
+p,.muted{color:#a8bad3;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.card{background:#111a2d;border:1px solid #283b59;border-radius:15px;padding:20px;margin:15px 0}
+input,textarea,button{font:inherit;width:100%;padding:12px;margin:6px 0;border-radius:8px}
+input,textarea{background:#080f20;border:1px solid #354766;color:white}
+textarea{min-height:90px;resize:vertical}
+button{background:#00eaff;color:#07101b;border:0;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.12)}
+.secondary{background:#293b57;color:white}
+.danger{background:#632c3a;color:white}
+.item{padding:12px 0;border-bottom:1px solid #293953;overflow-wrap:anywhere}
+.item button{width:auto;margin-right:6px}
+a{color:#00eaff}
+#app{display:none}
+.status{overflow-wrap:anywhere;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⚡ SAKIB CONTROL CENTER</div>
+  <a href="index.html">← Website</a>
+</header>
+
+<main>
+<section id="login" class="card">
+  <h1>Admin <span>Login</span></h1>
+  <p>Sign in with your authorized Google account.</p>
+  <button id="loginBtn">Continue with Google</button>
+  <p id="status" class="status">Configure Supabase to begin.</p>
+</section>
+
+<section id="app">
+  <h1>Welcome, <span>Admin!</span></h1>
+  <p>Manage your website resources and announcements.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>📁 Upload Files</h2>
+      <input id="file" type="file">
+      <button id="uploadBtn">Upload File</button>
+      <p class="muted">Uploads are stored in Supabase Storage.</p>
+    </div>
+
+    <div class="card">
+      <h2>📢 Announcement</h2>
+      <input id="annTitle" placeholder="Announcement title">
+      <textarea id="annBody" placeholder="Write your news or update"></textarea>
+      <button id="publishBtn">Publish Announcement</button>
+    </div>
+
+    <div class="card">
+      <h2>🔗 Add Download / Website</h2>
+      <input id="resTitle" placeholder="App, file or website name">
+      <input id="resUrl" type="url" placeholder="https://example.com">
+      <button id="addBtn">Publish Link</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📢 Published Announcements</h2>
+    <div id="annList">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>📦 Website Resources</h2>
+    <div id="resList">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>📁 Uploaded Files</h2>
+    <div id="fileList">Loading...</div>
+  </div>
+
+  <button id="logoutBtn" class="secondary">Sign Out</button>
+</section>
+</main>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const ADMIN = 'gdsakib67@gmail.com';
+
+// Replace these placeholders with your Supabase project details.
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+
+const login = document.querySelector('#login');
+const app = document.querySelector('#app');
+const status = document.querySelector('#status');
+
+let db = null;
+let currentUser = null;
+
+const ready = !SUPABASE_URL.includes('YOUR_') &&
+              !SUPABASE_KEY.includes('YOUR_');
+
+if (ready) {
+  db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const { data } = await db.auth.getSession();
+  await checkUser(data.session?.user);
+
+  db.auth.onAuthStateChange((_event, session) => {
+    setTimeout(() => checkUser(session?.user), 0);
+  });
+} else {
+  status.textContent =
+    'Setup required: add your Supabase project URL and publishable key.';
+}
+
+async function checkUser(user) {
+  currentUser = user || null;
+
+  if (user && user.email?.toLowerCase() === ADMIN &&
+      user.email_confirmed_at) {
+    login.style.display = 'none';
+    app.style.display = 'block';
+    status.textContent = '';
+    await refreshAll();
+  } else {
+    app.style.display = 'none';
+    login.style.display = 'block';
+
+    if (user) {
+      status.textContent = 'Access denied for this account.';
+      await db.auth.signOut();
+    }
+  }
+}
+
+document.querySelector('#loginBtn').onclick = async () => {
+  if (!db) return alert('Configure Supabase first.');
+
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: location.href.split('#')[0]
+    }
+  });
+
+  if (error) status.textContent = error.message;
+};
+
+document.querySelector('#logoutBtn').onclick = async () => {
+  if (db) await db.auth.signOut();
+};
+
+function safeText(tag, value) {
+  const el = document.createElement(tag);
+  el.textContent = value ?? '';
+  return el;
+}
+
+function safeUrl(raw) {
+  try {
+    const u = new URL(raw);
+    return u.protocol === 'https:' ? u.href : null;
+  } catch { return null; }
+}
+
+async function refreshAll() {
+  await Promise.all([loadAnnouncements(), loadResources(), loadFiles()]);
+}
+
+async function loadAnnouncements() {
+  const box = document.querySelector('#annList');
+  box.replaceChildren();
+
+  const { data, error } = await db.from('announcements')
+    .select('*').order('created_at', { ascending: false });
+
+  if (error) return box.textContent = error.message;
+
+  if (!data.length) box.textContent = 'No announcements yet.';
+
+  data.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', row.title));
+    item.append(safeText('p', row.body));
+
+    const edit = safeText('button', 'Edit');
+    edit.onclick = async () => {
+      const title = prompt('New title:', row.title);
+      if (title === null) return;
+      const body = prompt('New announcement:', row.body);
+      if (body === null) return;
+
+      const { error } = await db.from('announcements')
+        .update({ title, body }).eq('id', row.id);
+      if (error) alert(error.message);
+      await loadAnnouncements();
+    };
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Delete this announcement?')) return;
+      const { error } = await db.from('announcements')
+        .delete().eq('id', row.id);
+      if (error) alert(error.message);
+      await loadAnnouncements();
+    };
+
+    item.append(edit, del);
+    box.append(item);
+  });
+}
+
+async function loadResources() {
+  const box = document.querySelector('#resList');
+  box.replaceChildren();
+
+  const { data, error } = await db.from('resources')
+    .select('*').order('created_at', { ascending: false });
+
+  if (error) return box.textContent = error.message;
+  if (!data.length) box.textContent = 'No resources yet.';
+
+  data.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', row.title));
+    item.append(safeText('p', row.url));
+
+    const edit = safeText('button', 'Edit');
+    edit.onclick = async () => {
+      const title = prompt('New name:', row.title);
+      if (title === null) return;
+      const url = prompt('New HTTPS URL:', row.url);
+      if (url === null) return;
+      if (!safeUrl(url)) return alert('HTTPS links only.');
+
+      const { error } = await db.from('resources')
+        .update({ title, url }).eq('id', row.id);
+      if (error) alert(error.message);
+      await loadResources();
+    };
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Delete this link?')) return;
+      const { error } = await db.from('resources')
+        .delete().eq('id', row.id);
+      if (error) alert(error.message);
+      await loadResources();
+    };
+
+    item.append(edit, del);
+    box.append(item);
+  });
+}
+
+async function loadFiles() {
+  const box = document.querySelector('#fileList');
+  box.replaceChildren();
+
+  const { data, error } = await db.storage.from('site-files')
+    .list('', { limit: 100 });
+
+  if (error) return box.textContent = error.message;
+  if (!data.length) box.textContent = 'No uploaded files yet.';
+
+  data.forEach(file => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', file.name));
+
+    const { data: link } = db.storage.from('site-files')
+      .getPublicUrl(file.name);
+
+    const a = safeText('a', ' Open file');
+    a.href = link.publicUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    item.append(a);
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Permanently delete this file?')) return;
+      const { error } = await db.storage.from('site-files')
+        .remove([file.name]);
+      if (error) alert(error.message);
+      await loadFiles();
+    };
+
+    item.append(del);
+    box.append(item);
+  });
+}
+
+document.querySelector('#publishBtn').onclick = async () => {
+  const title = document.querySelector('#annTitle').value.trim();
+  const body = document.querySelector('#annBody').value.trim();
+  if (!title || !body) return alert('Enter title and announcement.');
+
+  const { error } = await db.from('announcements')
+    .insert({ title, body });
+
+  if (error) return alert(error.message);
+  document.querySelector('#annTitle').value = '';
+  document.querySelector('#annBody').value = '';
+  await loadAnnouncements();
+  alert('Announcement published to database.');
+};
+
+document.querySelector('#addBtn').onclick = async () => {
+  const title = document.querySelector('#resTitle').value.trim();
+  const url = safeUrl(document.querySelector('#resUrl').value.trim());
+  if (!title || !url) return alert('Enter a name and HTTPS link.');
+
+  const { error } = await db.from('resources').insert({ title, url });
+  if (error) return alert(error.message);
+
+  document.querySelector('#resTitle').value = '';
+  document.querySelector('#resUrl').value = '';
+  await loadResources();
+};
+
+document.querySelector('#uploadBtn').onclick = async () => {
+  const file = document.querySelector('#file').files[0];
+  if (!file) return alert('Choose a file first.');
+  if (file.size > 25 * 1024 * 1024)
+    return alert('Maximum file size is 25 MB.');
+
+  const path = crypto.randomUUID() + '-' +
+    file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  const { error } = await db.storage.from('site-files')
+    .upload(path, file, { upsert: false });
+
+  if (error) return alert(error.message);
+  await loadFiles();
+  alert('File uploaded to storage.');
+};
+</script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAKIB | Control Center</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080c18;color:#edf5ff;font:15px Arial,sans-serif}
+header{padding:20px;background:#111a2e;border-bottom:1px solid #263955;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:23px;font-weight:900;color:#00eaff}
+main{max-width:1100px;margin:auto;padding:22px}
+h1{font-size:clamp(26px,5vw,40px)}
+h1 span{color:#00eaff}
+p,.muted{color:#a8bad3;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.card{background:#111a2d;border:1px solid #283b59;border-radius:15px;padding:20px;margin:15px 0}
+input,textarea,button{font:inherit;width:100%;padding:12px;margin:6px 0;border-radius:8px}
+input,textarea{background:#080f20;border:1px solid #354766;color:white}
+textarea{min-height:90px;resize:vertical}
+button{background:#00eaff;color:#07101b;border:0;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.12)}
+.secondary{background:#293b57;color:white}
+.danger{background:#632c3a;color:white}
+.item{padding:12px 0;border-bottom:1px solid #293953;overflow-wrap:anywhere}
+.item button{width:auto;margin-right:6px}
+a{color:#00eaff}
+#app{display:none}
+.status{overflow-wrap:anywhere;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⚡ SAKIB CONTROL CENTER</div>
+  <a href="index.html">← Website</a>
+</header>
+
+<main>
+<section id="login" class="card">
+  <h1>Admin <span>Login</span></h1>
+  <p>Sign in with your authorized Google account.</p>
+  <button id="loginBtn">Continue with Google</button>
+  <p id="status" class="status">Configure Supabase to begin.</p>
+</section>
+
+<section id="app">
+  <h1>Welcome, <span>Admin!</span></h1>
+  <p>Manage your website resources and announcements.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>📁 Upload Files</h2>
+      <input id="file" type="file">
+      <button id="uploadBtn">Upload File</button>
+      <p class="muted">Uploads are stored in Supabase Storage.</p>
+    </div>
+
+    <div class="card">
+      <h2>📢 Announcement</h2>
+      <input id="annTitle" placeholder="Announcement title">
+      <textarea id="annBody" placeholder="Write your news or update"></textarea>
+      <button id="publishBtn">Publish Announcement</button>
+    </div>
+
+    <div class="card">
+      <h2>🔗 Add Download / Website</h2>
+      <input id="resTitle" placeholder="App, file or website name">
+      <input id="resUrl" type="url" placeholder="https://example.com">
+      <button id="addBtn">Publish Link</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📢 Published Announcements</h2>
+    <div id="annList">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>📦 Website Resources</h2>
+    <div id="resList">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>📁 Uploaded Files</h2>
+    <div id="fileList">Loading...</div>
+  </div>
+
+  <button id="logoutBtn" class="secondary">Sign Out</button>
+</section>
+</main>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const ADMIN = 'gdsakib67@gmail.com';
+
+// Replace these placeholders with your Supabase project details.
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+
+const login = document.querySelector('#login');
+const app = document.querySelector('#app');
+const status = document.querySelector('#status');
+
+let db = null;
+let currentUser = null;
+
+const ready = !SUPABASE_URL.includes('YOUR_') &&
+              !SUPABASE_KEY.includes('YOUR_');
+
+if (ready) {
+  db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const { data } = await db.auth.getSession();
+  await checkUser(data.session?.user);
+
+  db.auth.onAuthStateChange((_event, session) => {
+    setTimeout(() => checkUser(session?.user), 0);
+  });
+} else {
+  status.textContent =
+    'Setup required: add your Supabase project URL and publishable key.';
+}
+
+async function checkUser(user) {
+  currentUser = user || null;
+
+  if (user && user.email?.toLowerCase() === ADMIN &&
+      user.email_confirmed_at) {
+    login.style.display = 'none';
+    app.style.display = 'block';
+    status.textContent = '';
+    await refreshAll();
+  } else {
+    app.style.display = 'none';
+    login.style.display = 'block';
+
+    if (user) {
+      status.textContent = 'Access denied for this account.';
+      await db.auth.signOut();
+    }
+  }
+}
+
+document.querySelector('#loginBtn').onclick = async () => {
+  if (!db) return alert('Configure Supabase first.');
+
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: location.href.split('#')[0]
+    }
+  });
+
+  if (error) status.textContent = error.message;
+};
+
+document.querySelector('#logoutBtn').onclick = async () => {
+  if (db) await db.auth.signOut();
+};
+
+function safeText(tag, value) {
+  const el = document.createElement(tag);
+  el.textContent = value ?? '';
+  return el;
+}
+
+function safeUrl(raw) {
+  try {
+    const u = new URL(raw);
+    return u.protocol === 'https:' ? u.href : null;
+  } catch { return null; }
+}
+
+async function refreshAll() {
+  await Promise.all([loadAnnouncements(), loadResources(), loadFiles()]);
+}
+
+async function loadAnnouncements() {
+  const box = document.querySelector('#annList');
+  box.replaceChildren();
+
+  const { data, error } = await db.from('announcements')
+    .select('*').order('created_at', { ascending: false });
+
+  if (error) return box.textContent = error.message;
+
+  if (!data.length) box.textContent = 'No announcements yet.';
+
+  data.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', row.title));
+    item.append(safeText('p', row.body));
+
+    const edit = safeText('button', 'Edit');
+    edit.onclick = async () => {
+      const title = prompt('New title:', row.title);
+      if (title === null) return;
+      const body = prompt('New announcement:', row.body);
+      if (body === null) return;
+
+      const { error } = await db.from('announcements')
+        .update({ title, body }).eq('id', row.id);
+      if (error) alert(error.message);
+      await loadAnnouncements();
+    };
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Delete this announcement?')) return;
+      const { error } = await db.from('announcements')
+        .delete().eq('id', row.id);
+      if (error) alert(error.message);
+      await loadAnnouncements();
+    };
+
+    item.append(edit, del);
+    box.append(item);
+  });
+}
+
+async function loadResources() {
+  const box = document.querySelector('#resList');
+  box.replaceChildren();
+
+  const { data, error } = await db.from('resources')
+    .select('*').order('created_at', { ascending: false });
+
+  if (error) return box.textContent = error.message;
+  if (!data.length) box.textContent = 'No resources yet.';
+
+  data.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', row.title));
+    item.append(safeText('p', row.url));
+
+    const edit = safeText('button', 'Edit');
+    edit.onclick = async () => {
+      const title = prompt('New name:', row.title);
+      if (title === null) return;
+      const url = prompt('New HTTPS URL:', row.url);
+      if (url === null) return;
+      if (!safeUrl(url)) return alert('HTTPS links only.');
+
+      const { error } = await db.from('resources')
+        .update({ title, url }).eq('id', row.id);
+      if (error) alert(error.message);
+      await loadResources();
+    };
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Delete this link?')) return;
+      const { error } = await db.from('resources')
+        .delete().eq('id', row.id);
+      if (error) alert(error.message);
+      await loadResources();
+    };
+
+    item.append(edit, del);
+    box.append(item);
+  });
+}
+
+async function loadFiles() {
+  const box = document.querySelector('#fileList');
+  box.replaceChildren();
+
+  const { data, error } = await db.storage.from('site-files')
+    .list('', { limit: 100 });
+
+  if (error) return box.textContent = error.message;
+  if (!data.length) box.textContent = 'No uploaded files yet.';
+
+  data.forEach(file => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', file.name));
+
+    const { data: link } = db.storage.from('site-files')
+      .getPublicUrl(file.name);
+
+    const a = safeText('a', ' Open file');
+    a.href = link.publicUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    item.append(a);
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Permanently delete this file?')) return;
+      const { error } = await db.storage.from('site-files')
+        .remove([file.name]);
+      if (error) alert(error.message);
+      await loadFiles();
+    };
+
+    item.append(del);
+    box.append(item);
+  });
+}
+
+document.querySelector('#publishBtn').onclick = async () => {
+  const title = document.querySelector('#annTitle').value.trim();
+  const body = document.querySelector('#annBody').value.trim();
+  if (!title || !body) return alert('Enter title and announcement.');
+
+  const { error } = await db.from('announcements')
+    .insert({ title, body });
+
+  if (error) return alert(error.message);
+  document.querySelector('#annTitle').value = '';
+  document.querySelector('#annBody').value = '';
+  await loadAnnouncements();
+  alert('Announcement published to database.');
+};
+
+document.querySelector('#addBtn').onclick = async () => {
+  const title = document.querySelector('#resTitle').value.trim();
+  const url = safeUrl(document.querySelector('#resUrl').value.trim());
+  if (!title || !url) return alert('Enter a name and HTTPS link.');
+
+  const { error } = await db.from('resources').insert({ title, url });
+  if (error) return alert(error.message);
+
+  document.querySelector('#resTitle').value = '';
+  document.querySelector('#resUrl').value = '';
+  await loadResources();
+};
+
+document.querySelector('#uploadBtn').onclick = async () => {
+  const file = document.querySelector('#file').files[0];
+  if (!file) return alert('Choose a file first.');
+  if (file.size > 25 * 1024 * 1024)
+    return alert('Maximum file size is 25 MB.');
+
+  const path = crypto.randomUUID() + '-' +
+    file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  const { error } = await db.storage.from('site-files')
+    .upload(path, file, { upsert: false });
+
+  if (error) return alert(error.message);
+  await loadFiles();
+  alert('File uploaded to storage.');
+};
+</script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAKIB | Control Center</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080c18;color:#edf5ff;font:15px Arial,sans-serif}
+header{padding:20px;background:#111a2e;border-bottom:1px solid #263955;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:23px;font-weight:900;color:#00eaff}
+main{max-width:1100px;margin:auto;padding:22px}
+h1{font-size:clamp(26px,5vw,40px)}
+h1 span{color:#00eaff}
+p,.muted{color:#a8bad3;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.card{background:#111a2d;border:1px solid #283b59;border-radius:15px;padding:20px;margin:15px 0}
+input,textarea,button{font:inherit;width:100%;padding:12px;margin:6px 0;border-radius:8px}
+input,textarea{background:#080f20;border:1px solid #354766;color:white}
+textarea{min-height:90px;resize:vertical}
+button{background:#00eaff;color:#07101b;border:0;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.12)}
+.secondary{background:#293b57;color:white}
+.danger{background:#632c3a;color:white}
+.item{padding:12px 0;border-bottom:1px solid #293953;overflow-wrap:anywhere}
+.item button{width:auto;margin-right:6px}
+a{color:#00eaff}
+#app{display:none}
+.status{overflow-wrap:anywhere;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⚡ SAKIB CONTROL CENTER</div>
+  <a href="index.html">← Website</a>
+</header>
+
+<main>
+<section id="login" class="card">
+  <h1>Admin <span>Login</span></h1>
+  <p>Sign in with your authorized Google account.</p>
+  <button id="loginBtn">Continue with Google</button>
+  <p id="status" class="status">Configure Supabase to begin.</p>
+</section>
+
+<section id="app">
+  <h1>Welcome, <span>Admin!</span></h1>
+  <p>Manage your website resources and announcements.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>📁 Upload Files</h2>
+      <input id="file" type="file">
+      <button id="uploadBtn">Upload File</button>
+      <p class="muted">Uploads are stored in Supabase Storage.</p>
+    </div>
+
+    <div class="card">
+      <h2>📢 Announcement</h2>
+      <input id="annTitle" placeholder="Announcement title">
+      <textarea id="annBody" placeholder="Write your news or update"></textarea>
+      <button id="publishBtn">Publish Announcement</button>
+    </div>
+
+    <div class="card">
+      <h2>🔗 Add Download / Website</h2>
+      <input id="resTitle" placeholder="App, file or website name">
+      <input id="resUrl" type="url" placeholder="https://example.com">
+      <button id="addBtn">Publish Link</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📢 Published Announcements</h2>
+    <div id="annList">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>📦 Website Resources</h2>
+    <div id="resList">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h2>📁 Uploaded Files</h2>
+    <div id="fileList">Loading...</div>
+  </div>
+
+  <button id="logoutBtn" class="secondary">Sign Out</button>
+</section>
+</main>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const ADMIN = 'gdsakib67@gmail.com';
+
+// Replace these placeholders with your Supabase project details.
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+
+const login = document.querySelector('#login');
+const app = document.querySelector('#app');
+const status = document.querySelector('#status');
+
+let db = null;
+let currentUser = null;
+
+const ready = !SUPABASE_URL.includes('YOUR_') &&
+              !SUPABASE_KEY.includes('YOUR_');
+
+if (ready) {
+  db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const { data } = await db.auth.getSession();
+  await checkUser(data.session?.user);
+
+  db.auth.onAuthStateChange((_event, session) => {
+    setTimeout(() => checkUser(session?.user), 0);
+  });
+} else {
+  status.textContent =
+    'Setup required: add your Supabase project URL and publishable key.';
+}
+
+async function checkUser(user) {
+  currentUser = user || null;
+
+  if (user && user.email?.toLowerCase() === ADMIN &&
+      user.email_confirmed_at) {
+    login.style.display = 'none';
+    app.style.display = 'block';
+    status.textContent = '';
+    await refreshAll();
+  } else {
+    app.style.display = 'none';
+    login.style.display = 'block';
+
+    if (user) {
+      status.textContent = 'Access denied for this account.';
+      await db.auth.signOut();
+    }
+  }
+}
+
+document.querySelector('#loginBtn').onclick = async () => {
+  if (!db) return alert('Configure Supabase first.');
+
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: location.href.split('#')[0]
+    }
+  });
+
+  if (error) status.textContent = error.message;
+};
+
+document.querySelector('#logoutBtn').onclick = async () => {
+  if (db) await db.auth.signOut();
+};
+
+function safeText(tag, value) {
+  const el = document.createElement(tag);
+  el.textContent = value ?? '';
+  return el;
+}
+
+function safeUrl(raw) {
+  try {
+    const u = new URL(raw);
+    return u.protocol === 'https:' ? u.href : null;
+  } catch { return null; }
+}
+
+async function refreshAll() {
+  await Promise.all([loadAnnouncements(), loadResources(), loadFiles()]);
+}
+
+async function loadAnnouncements() {
+  const box = document.querySelector('#annList');
+  box.replaceChildren();
+
+  const { data, error } = await db.from('announcements')
+    .select('*').order('created_at', { ascending: false });
+
+  if (error) return box.textContent = error.message;
+
+  if (!data.length) box.textContent = 'No announcements yet.';
+
+  data.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', row.title));
+    item.append(safeText('p', row.body));
+
+    const edit = safeText('button', 'Edit');
+    edit.onclick = async () => {
+      const title = prompt('New title:', row.title);
+      if (title === null) return;
+      const body = prompt('New announcement:', row.body);
+      if (body === null) return;
+
+      const { error } = await db.from('announcements')
+        .update({ title, body }).eq('id', row.id);
+      if (error) alert(error.message);
+      await loadAnnouncements();
+    };
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Delete this announcement?')) return;
+      const { error } = await db.from('announcements')
+        .delete().eq('id', row.id);
+      if (error) alert(error.message);
+      await loadAnnouncements();
+    };
+
+    item.append(edit, del);
+    box.append(item);
+  });
+}
+
+async function loadResources() {
+  const box = document.querySelector('#resList');
+  box.replaceChildren();
+
+  const { data, error } = await db.from('resources')
+    .select('*').order('created_at', { ascending: false });
+
+  if (error) return box.textContent = error.message;
+  if (!data.length) box.textContent = 'No resources yet.';
+
+  data.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', row.title));
+    item.append(safeText('p', row.url));
+
+    const edit = safeText('button', 'Edit');
+    edit.onclick = async () => {
+      const title = prompt('New name:', row.title);
+      if (title === null) return;
+      const url = prompt('New HTTPS URL:', row.url);
+      if (url === null) return;
+      if (!safeUrl(url)) return alert('HTTPS links only.');
+
+      const { error } = await db.from('resources')
+        .update({ title, url }).eq('id', row.id);
+      if (error) alert(error.message);
+      await loadResources();
+    };
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Delete this link?')) return;
+      const { error } = await db.from('resources')
+        .delete().eq('id', row.id);
+      if (error) alert(error.message);
+      await loadResources();
+    };
+
+    item.append(edit, del);
+    box.append(item);
+  });
+}
+
+async function loadFiles() {
+  const box = document.querySelector('#fileList');
+  box.replaceChildren();
+
+  const { data, error } = await db.storage.from('site-files')
+    .list('', { limit: 100 });
+
+  if (error) return box.textContent = error.message;
+  if (!data.length) box.textContent = 'No uploaded files yet.';
+
+  data.forEach(file => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.append(safeText('strong', file.name));
+
+    const { data: link } = db.storage.from('site-files')
+      .getPublicUrl(file.name);
+
+    const a = safeText('a', ' Open file');
+    a.href = link.publicUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    item.append(a);
+
+    const del = safeText('button', 'Delete');
+    del.className = 'danger';
+    del.onclick = async () => {
+      if (!confirm('Permanently delete this file?')) return;
+      const { error } = await db.storage.from('site-files')
+        .remove([file.name]);
+      if (error) alert(error.message);
+      await loadFiles();
+    };
+
+    item.append(del);
+    box.append(item);
+  });
+}
+
+document.querySelector('#publishBtn').onclick = async () => {
+  const title = document.querySelector('#annTitle').value.trim();
+  const body = document.querySelector('#annBody').value.trim();
+  if (!title || !body) return alert('Enter title and announcement.');
+
+  const { error } = await db.from('announcements')
+    .insert({ title, body });
+
+  if (error) return alert(error.message);
+  document.querySelector('#annTitle').value = '';
+  document.querySelector('#annBody').value = '';
+  await loadAnnouncements();
+  alert('Announcement published to database.');
+};
+
+document.querySelector('#addBtn').onclick = async () => {
+  const title = document.querySelector('#resTitle').value.trim();
+  const url = safeUrl(document.querySelector('#resUrl').value.trim());
+  if (!title || !url) return alert('Enter a name and HTTPS link.');
+
+  const { error } = await db.from('resources').insert({ title, url });
+  if (error) return alert(error.message);
+
+  document.querySelector('#resTitle').value = '';
+  document.querySelector('#resUrl').value = '';
+  await loadResources();
+};
+
+document.querySelector('#uploadBtn').onclick = async () => {
+  const file = document.querySelector('#file').files[0];
+  if (!file) return alert('Choose a file first.');
+  if (file.size > 25 * 1024 * 1024)
+    return alert('Maximum file size is 25 MB.');
+
+  const path = crypto.randomUUID() + '-' +
+    file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  const { error } = await db.storage.from('site-files')
+    .upload(path, file, { upsert: false });
+
+  if (error) return alert(error.message);
+  await loadFiles();
+  alert('File uploaded to storage.');
+};
+</script>
+</body>
+</html>
